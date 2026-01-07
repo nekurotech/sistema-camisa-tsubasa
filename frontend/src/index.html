@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pedido TSUBASA Voleibol</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #0d2240; /* Azul Marinho do Logo */
+        --accent-color: #2c3e50;
+        --bg-color: #f0f2f5;
+        --white: #ffffff;
+        --success: #27ae60;
+        --border: #dfe6e9;
+      }
+
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--bg-color);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+      }
+
+      .container {
+        background-color: #fcfbf8;
+        width: 100%;
+        max-width: 450px;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .logo {
+        max-width: 150px; /* Tamanho ajustado do logo */
+        height: auto;
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        color: var(--primary-color);
+        margin: 0;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .full-width {
+        grid-column: span 2;
+      }
+
+      .form-group {
+        margin-bottom: 5px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--accent-color);
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        background-color: #fafafa;
+        transition: border-color 0.3s;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background-color: #fff;
+      }
+
+      /* ESTILO DAS FOTOS */
+      .photos-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 5px;
+      }
+
+      .photo-thumb {
+        width: 80px;
+        height: 80px;
+        object-fit: cover; /* Corta a imagem para caber no quadrado */
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
+        background-color: #ddd; /* Cor de fundo caso a imagem não carregue */
+      }
+
+      .photo-thumb:hover {
+        transform: scale(1.05);
+        border-color: var(--primary-color);
+      }
+
+      /* ESTILO DO MODAL (FOTO GRANDE) */
+      .modal-overlay {
+        display: none; /* Escondido por padrão */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .modal-img {
+        max-width: 90%;
+        max-height: 80vh;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-close {
+        margin-top: 15px;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        border: 1px solid white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-add {
+        background-color: var(--primary-color);
+        color: white;
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: background 0.3s;
+        text-transform: uppercase;
+      }
+
+      .btn-add:hover {
+        background-color: #1a3a5e;
+      }
+
+      .lista-container {
+        margin-top: 30px;
+        border-top: 2px dashed var(--border);
+        padding-top: 20px;
+      }
+
+      .titulo-lista {
+        font-size: 1.1rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .item-pedido {
+        background: #f8f9fa;
+        border-left: 4px solid var(--primary-color);
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+      }
+
+      .detalhes-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .detalhes-item strong {
+        color: var(--primary-color);
+      }
+
+      .detalhes-item span {
+        color: #666;
+        font-size: 0.85rem;
+      }
+
+      .preco-item {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .btn-remove {
+        background: none;
+        border: none;
+        color: #e74c3c;
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin-left: 10px;
+      }
+
+      .container-total-box {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px;
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+
+      .total-box {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn-send {
+        background-color: var(--success);
+        color: white;
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+      }
+
+      .btn-send:active {
+        transform: scale(0.98);
+      }
+
+      /* Animação simples */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .item-pedido {
+        animation: fadeIn 0.3s ease-out;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="assets/logo-tsubasa.png" alt="Logo Tsubasa" class="logo" />
+        <h2>Novo Pedido da Camiseta</h2>
+      </div>
+
+      <div class="form-grid">
+        <div class="full-width form-group">
+          <label>Nome do Comprador (Obrigatório)</label>
+          <input type="text" id="nomecomprador" placeholder="Ex: SUZUKI" />
+        </div>
+
+        <div class="full-width form-group">
+          <label>Telefone para Contato (Obrigatório)</label>
+          <input type="tel" id="telefone" placeholder="Ex: 090-0000-0000" />
+        </div>
+
+        <div class="full-width form-group">
+          <label>Nome na Camisa</label>
+          <input type="text" id="nomejogador" placeholder="Ex: SUZUKI" />
+        </div>
+
+        <div class="form-group">
+          <label>Tamanho (JP)</label>
+          <select id="tamanho">
+            <option value="JP-M">JP-M</option>
+            <option value="JP-L">JP-L</option>
+            <option value="JP-LL">JP-LL</option>
+            <option value="JP-XL">JP-XL</option>
+            <option value="JP-XXL">JP-XXL</option>
+            <option value="JP-3XL">JP-3XL</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Número (Máx 999)</label>
+          <input
+            type="number"
+            id="numero"
+            placeholder="Ex: 10"
+            min="0"
+            max="999"
+          />
+        </div>
+
+        <div class="full-width form-group">
+          <label>Cor / Modelo</label>
+          <select id="cor">
+            <option value="branco">Branco (¥1100)</option>
+            <option value="preto">Preto (¥1800)</option>
+          </select>
+        </div>
+
+        <div class="full-width form-group">
+          <label>Fotos do Modelo (Toque para ampliar)</label>
+          <div class="photos-container">
+            <img
+              src="assets/camisa branco exemplo.png"
+              class="photo-thumb"
+              onclick="abrirFoto(this.src)"
+              alt="Foto 1"
+            />
+            <img
+              src="assets/camisa preta exemplo.png"
+              class="photo-thumb"
+              onclick="abrirFoto(this.src)"
+              alt="Foto 2"
+            />
+            <img
+              src="assets/tabela de tamanho.png"
+              class="photo-thumb"
+              onclick="abrirFoto(this.src)"
+              alt="Foto 3"
+            />
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-add" onclick="adicionarCamiseta()">
+        Adicionar Camisa +
+      </button>
+
+      <div class="lista-container" id="listaContainer" style="display: none">
+        <div class="titulo-lista">Resumo do Pedido</div>
+        <div id="lista"></div>
+        <div class="container-total-box">
+          <div class="total-box">
+            <span>Frete:</span>
+            <span>¥ 300</span>
+          </div>
+
+          <div class="total-box">
+            <h2 style="color: white">Total:</h2>
+            <h2 style="color: white">¥ <span id="valorTotal">0</span></h2>
+          </div>
+        </div>
+
+        <button class="btn-send" onclick="enviarParaBackend()">
+          Confirmar e Enviar 🏐
+        </button>
+      </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay" onclick="fecharFoto()">
+      <img id="imgGrande" class="modal-img" src="" alt="Ampliada" />
+      <div class="modal-close">Fechar X</div>
+    </div>
+
+    <script>
+      // --- CONFIGURAÇÃO ---
+      const API_URL = '/api/salvar'
+      // --------------------
+
+      // --- FUNÇÕES DE FOTO ---
+      function abrirFoto(src) {
+        const modal = document.getElementById('modalOverlay')
+        const imgGrande = document.getElementById('imgGrande')
+        imgGrande.src = src
+        modal.style.display = 'flex'
+      }
+
+      function fecharFoto() {
+        document.getElementById('modalOverlay').style.display = 'none'
+      }
+      // -----------------------------
+
+      let pedidos = []
+      let totalGeral = 0
+
+      function adicionarCamiseta() {
+        const nomecomprador = document
+          .getElementById('nomecomprador')
+          .value.trim()
+        const telefone = document.getElementById('telefone').value.trim()
+        const nomejogador = document.getElementById('nomejogador').value.trim()
+        const tamanho = document.getElementById('tamanho').value
+        const numero = document.getElementById('numero').value
+        const cor = document.getElementById('cor').value
+
+        // Verifica se Nome, Telefone e campos da camisa estão preenchidos
+        if (!nomecomprador || !telefone || !nomejogador || !numero) {
+          alert('Por favor, preencha o todos os campos em branco.')
+          return
+        }
+
+        // AQUI: Verificação do limite do número (entre 0 e 999)
+        if (parseInt(numero) > 999 || parseInt(numero) < 0) {
+          alert('O número da camisa deve ser entre 0 e 999.')
+          return
+        }
+
+        // Definição dos preços em Ienes
+        const preco = cor === 'preto' ? 1800 : 1100
+
+        const item = {
+          id: Date.now(),
+          nomecomprador,
+          telefone,
+          nomejogador,
+          tamanho,
+          numero,
+          cor,
+          preco,
+        }
+
+        pedidos.push(item)
+        atualizarInterface()
+
+        // Limpa campos para o próximo item
+        document.getElementById('nomejogador').value = ''
+        document.getElementById('numero').value = ''
+        document.getElementById('nomejogador').focus()
+      }
+
+      function removerItem(id) {
+        pedidos = pedidos.filter((p) => p.id !== id)
+        atualizarInterface()
+      }
+
+      function atualizarInterface() {
+        const listaDiv = document.getElementById('lista')
+        const containerLista = document.getElementById('listaContainer')
+        const totalSpan = document.getElementById('valorTotal')
+
+        const inputNomeComprador = document.getElementById('nomecomprador')
+        const inputTelefone = document.getElementById('telefone')
+
+        listaDiv.innerHTML = ''
+        totalGeral = 0
+
+        if (pedidos.length > 0) {
+          containerLista.style.display = 'block'
+
+          // Bloqueia Nome e Telefone
+          inputNomeComprador.disabled = true
+          inputNomeComprador.style.backgroundColor = '#e9ecef'
+          inputNomeComprador.title =
+            'Termine este pedido ou remova os itens para trocar de nome'
+
+          inputTelefone.disabled = true
+          inputTelefone.style.backgroundColor = '#e9ecef'
+        } else {
+          containerLista.style.display = 'none'
+
+          // Desbloqueia Nome e Telefone
+          inputNomeComprador.disabled = false
+          inputNomeComprador.style.backgroundColor = '#fafafa'
+          inputNomeComprador.title = ''
+
+          inputTelefone.disabled = false
+          inputTelefone.style.backgroundColor = '#fafafa'
+        }
+
+        pedidos.forEach((p) => {
+          totalGeral += p.preco
+
+          listaDiv.innerHTML += `
+                <div class="item-pedido">
+                    <div class="detalhes-item">
+                        <strong>${p.nomejogador} (#${p.numero})</strong>
+                        <span>Tam: ${p.tamanho} | Cor: ${p.cor.toUpperCase()}</span>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <span class="preco-item">¥${p.preco}</span>
+                        <button class="btn-remove" onclick="removerItem(${p.id})">&times;</button>
+                    </div>
+                </div>`
+        })
+
+        totalGeral += 300
+
+        totalSpan.innerText = totalGeral
+      }
+
+      async function enviarParaBackend() {
+        if (
+          !confirm(
+            `Confirma o pedido de ${pedidos.length} camisas no total de ¥${totalGeral}?`
+          )
+        )
+          return
+
+        const btn = document.querySelector('.btn-send')
+        const textoOriginal = btn.innerText
+        btn.innerText = 'Enviando...'
+        btn.disabled = true
+
+        try {
+          const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pedidos,
+              total: totalGeral,
+              data: new Date(),
+            }),
+          })
+
+          if (response.ok) {
+            alert(
+              'Pedido enviado com sucesso! Obrigado. Caso deseja cancelar, entre em contato com o administrador do Tsubasa!'
+            )
+            pedidos = []
+            atualizarInterface()
+          } else {
+            alert('Erro ao enviar. Tente novamente.')
+          }
+        } catch (error) {
+          console.error(error)
+          alert('Erro de conexão. Verifique se o servidor está ligado.')
+        } finally {
+          btn.innerText = textoOriginal
+          btn.disabled = false
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+limit_req_zone $binary_remote_addr zone=meulimite:10m rate=5r/s;
+
+server {
+    listen 80;
+    root /usr/share/nginx/html/src;
+    index index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api/ {
+        limit_req zone=meulimite burst=10 nodelay;
+        proxy_pass http://backend:${SERVER_PORT}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}

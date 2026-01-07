@@ -1,0 +1,28 @@
+services:
+  # Serviço do Frontend (HTML/CSS/JS)
+  frontend:
+    image: nginx:alpine
+    restart: always
+    environment:
+      - SERVER_PORT=${SERVER_PORT}
+      - NGINX_ENVSUBST_FILTER=SERVER_PORT
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - ./frontend/default.conf.template:/etc/nginx/templates/default.conf.template
+    ports:
+      - '${APP_PORT}:80'
+    depends_on:
+      - backend
+
+  # Serviço do Backend (Node.js)
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: always
+    volumes:
+      - ./backend/data:/app/backend/data
+    env_file:
+      - ./backend/.env
+    expose:
+      - ${SERVER_PORT}
