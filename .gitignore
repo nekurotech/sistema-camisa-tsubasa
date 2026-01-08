@@ -32,3 +32,5 @@ out/
 backend/data/*
 
 !backend/data/.gitkeep
+
+docker-compose.override.yml

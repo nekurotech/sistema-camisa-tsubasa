@@ -2,6 +2,9 @@ services:
   # Serviço do Frontend (HTML/CSS/JS)
   frontend:
     image: nginx:alpine
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     restart: always
     environment:
       - SERVER_PORT=${SERVER_PORT}
@@ -21,8 +24,11 @@ services:
       dockerfile: backend/Dockerfile
     restart: always
     volumes:
-      - ./backend/data:/app/backend/data
+      - dados-pedidos:/app/backend/data
     env_file:
       - ./backend/.env
     expose:
       - ${SERVER_PORT}
+
+volumes:
+  dados-pedidos:
