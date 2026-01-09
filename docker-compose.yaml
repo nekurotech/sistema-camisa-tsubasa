@@ -23,7 +23,7 @@ services:
     volumes:
       - dados-pedidos:/app/backend/data
     env_file:
-      - ./backend/.env
+      - ./.env
     expose:
       - ${SERVER_PORT}
 
