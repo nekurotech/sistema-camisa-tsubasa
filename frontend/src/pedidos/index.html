@@ -3,23 +3,44 @@
   <head>
     <meta charset="UTF-8" />
     <title>Lista de Pedidos - Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/assets/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/apple-touch-icon.png"
+    />
+    <link rel="manifest" href="/assets/site.webmanifest" />
     <style>
       body {
-        font-family: sans-serif;
+        font-family: 'Roboto', sans-serif;
         background: #f4f4f4;
         padding: 20px;
+        padding-bottom: 100px;
       }
       .container {
         background: white;
         padding: 20px;
         border-radius: 8px;
-        max-width: 800px;
+        max-width: 1000px;
         margin: auto;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
       h2 {
         text-align: center;
-        color: #333;
+        color: #0d2240;
+        margin-bottom: 20px;
       }
       table {
         width: 100%;
@@ -31,18 +52,29 @@
         border: 1px solid #ddd;
         padding: 12px;
         text-align: left;
+        vertical-align: middle;
       }
       th {
-        background-color: #f8f9fa;
+        background-color: #0d2240;
+        color: white;
+        text-transform: uppercase;
+        font-size: 0.9em;
       }
       tr:nth-child(even) {
         background-color: #fafafa;
       }
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      /* Badges e Checkboxes */
       .badge {
         padding: 4px 8px;
         border-radius: 4px;
         font-size: 0.8em;
         font-weight: bold;
+        display: inline-block;
+        margin-bottom: 2px;
       }
       .preto {
         background: #333;
@@ -53,20 +85,139 @@
         color: #333;
         border: 1px solid #ccc;
       }
+
+      .checkbox-cell {
+        text-align: center;
+      }
+      .custom-checkbox {
+        transform: scale(1.5);
+        cursor: pointer;
+        accent-color: #27ae60;
+      }
+
+      .btn-delete {
+        background-color: #ffebee;
+        color: #c62828;
+        border: 1px solid #ef9a9a;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: all 0.2s;
+      }
+      .btn-delete:hover {
+        background-color: #c62828;
+        color: white;
+      }
+
+      /* --- PAINEL FLUTUANTE --- */
+      .floating-controls {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        z-index: 1000;
+        border: 1px solid #eee;
+
+        animation: slideUp 0.5s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .btn-reload {
+        background-color: #2980b9;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition:
+          transform 0.2s,
+          background 0.2s;
+        box-shadow: 0 2px 5px rgba(41, 128, 185, 0.3);
+      }
+
+      .btn-reload:hover {
+        background-color: #1f618d;
+        transform: translateY(-2px);
+      }
+      .btn-reload:active {
+        transform: scale(0.95);
+      }
+
+      .last-update-text {
+        color: #7f8c8d;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-align: right;
+        min-width: 140px;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+      }
+
+      .last-update-text span {
+        font-size: 0.7rem;
+        color: #bdc3c7;
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+
+      .swal2-popup {
+        font-family: 'Roboto', sans-serif !important;
+      }
     </style>
   </head>
   <body>
+    <div class="floating-controls">
+      <div class="last-update-text">
+        <span>Status</span>
+        <div id="tempoUpdate">Atualizado agora</div>
+      </div>
+      <button class="btn-reload" onclick="loadOrdersManual()">
+        🔄 Atualizar
+      </button>
+    </div>
+
     <div class="container">
-      <h2>📋 Pedidos Realizados</h2>
-      <div id="status">Carregando pedidos...</div>
+      <h2>📋 Gerenciamento de Pedidos</h2>
+
+      <div
+        id="status"
+        style="text-align: center; color: #666; margin-top: 20px"
+      >
+        Carregando pedidos...
+      </div>
+
       <table id="tabelaPedidos" style="display: none">
         <thead>
           <tr>
             <th>Comprador</th>
-            <th>Número</th>
             <th>Data</th>
-            <th>Itens (Nome, Tam, Num, Cor)</th>
+            <th style="width: 35%">Itens</th>
             <th>Total</th>
+            <th style="text-align: center">Pedido<br />Feito?</th>
+            <th style="text-align: center">Chegou?</th>
+            <th style="text-align: center">Ações</th>
           </tr>
         </thead>
         <tbody id="corpoTabela"></tbody>
@@ -74,58 +225,221 @@
     </div>
 
     <script>
-      async function carregarPedidos() {
+      const API_URL = '/api/pedidos'
+      let lastUpdate = Date.now()
+
+      function loadOrdersManual() {
+        const reloadButton = document.querySelector('.btn-reload')
+        const originalContent = reloadButton.innerHTML
+
+        reloadButton.innerHTML = '⏳ ...'
+        reloadButton.disabled = true
+
+        loadOrders().finally(() => {
+          reloadButton.innerHTML = '🔄 Atualizar'
+          reloadButton.disabled = false
+        })
+      }
+
+      async function loadOrders() {
+        const tableBody = document.getElementById('corpoTabela')
+        const statusMessage = document.getElementById('status')
+        const ordersTable = document.getElementById('tabelaPedidos')
+
         try {
-          const response = await fetch('/api/pedidos')
-          const dados = await response.json()
+          if (tableBody.children.length === 0) {
+            statusMessage.style.display = 'block'
+            statusMessage.innerText = 'Carregando...'
+          }
 
-          const corpo = document.getElementById('corpoTabela')
-          const status = document.getElementById('status')
-          const tabela = document.getElementById('tabelaPedidos')
+          const response = await fetch(`${API_URL}?t=${Date.now()}`)
 
-          if (dados.length === 0) {
-            status.innerText = 'Nenhum pedido encontrado.'
+          if (!response.ok) throw new Error('Falha na conexão')
+
+          const data = await response.json()
+
+          lastUpdate = Date.now()
+          updateTimeText()
+
+          if (data.length === 0) {
+            statusMessage.innerText = 'Nenhum pedido encontrado no sistema.'
+            ordersTable.style.display = 'none'
+            tableBody.innerHTML = ''
             return
           }
 
-          status.style.display = 'none'
-          tabela.style.display = 'table'
+          statusMessage.style.display = 'none'
+          ordersTable.style.display = 'table'
 
-          dados.reverse().forEach((pedido) => {
-            // reverse para ver o mais recente primeiro
-            const dataComprador = pedido.pedidos[0].nomecomprador
-            const dataTelefone = pedido.pedidos[0].telefone
-            const dataFormatada = new Date(pedido.data).toLocaleDateString(
-              'pt-BR'
+          tableBody.innerHTML = ''
+
+          data.reverse().forEach((order) => {
+            // Compatibility check: tries 'orders' (new) or 'pedidos' (old)
+            const itemsList = order.orders || order.pedidos || []
+            const firstItem = itemsList[0] || {}
+
+            // Checks for new English keys or falls back to old Portuguese keys
+            const buyerName =
+              firstItem.buyerName || firstItem.nomecomprador || 'Desconhecido'
+            const buyerPhone = firstItem.phone || firstItem.telefone || '-'
+
+            const formattedDate = new Date(order.data).toLocaleDateString(
+              'pt-BR',
+              {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              }
             )
 
-            // Formata os itens de cada pedido em uma lista
-            const itensFormatados = pedido.pedidos
-              .map(
-                (item) =>
-                  `<div> <span class="badge ${item.cor}">${item.cor.toUpperCase()}</span>　
-                        ${item.nomejogador}, tamanho ${item.tamanho} - nº ${item.numero}
-                    </div>`
-              )
+            const formattedItems = itemsList
+              .map((item) => {
+                const color = item.color || item.cor
+                const name = item.playerName || item.nomejogador
+                const number = item.number || item.numero
+                const size = item.size || item.tamanho
+
+                return `<div>
+                          <span class="badge ${color}">${color.toUpperCase()}</span>
+                          <strong>${name}</strong> (#${number}) - ${size}
+                        </div>`
+              })
               .join('')
 
-            const row = `<tr>
-                    <td>${dataComprador}</td>
-                    <td>${dataTelefone}</td>
-                    <td>${dataFormatada}</td>
-                    <td>${itensFormatados}</td>
-                    <td><strong>¥ ${pedido.total}</strong></td>
-                </tr>`
-            corpo.innerHTML += row
+            const isDoneChecked = order.status_realizado ? 'checked' : ''
+            const isArrivedChecked = order.status_chegou ? 'checked' : ''
+
+            const tableRow = `
+                    <tr id="row-${order.id}">
+                        <td>
+                            <strong>${buyerName}</strong><br>
+                            <small>📞 ${buyerPhone}</small>
+                        </td>
+                        <td>${formattedDate}</td>
+                        <td>${formattedItems}</td>
+                        <td><strong>¥ ${order.total}</strong></td>
+
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="custom-checkbox"
+                                onchange="updateStatus(${order.id}, 'status_realizado', this.checked)"
+                                ${isDoneChecked}>
+                        </td>
+
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="custom-checkbox"
+                                onchange="updateStatus(${order.id}, 'status_chegou', this.checked)"
+                                ${isArrivedChecked}>
+                        </td>
+
+                        <td class="checkbox-cell">
+                            <button class="btn-delete" title="Excluir Pedido" onclick="confirmDeletion(${order.id})">🗑️</button>
+                        </td>
+                    </tr>`
+
+            tableBody.innerHTML += tableRow
           })
         } catch (error) {
-          document.getElementById('status').innerText =
-            'Erro ao carregar dados.'
+          if (tableBody.children.length === 0) {
+            statusMessage.innerText =
+              'Erro ao carregar dados. O servidor pode estar offline.'
+            statusMessage.style.color = 'red'
+          }
           console.error(error)
         }
       }
 
-      carregarPedidos()
+      function updateTimeText() {
+        const now = Date.now()
+        const diffSeconds = Math.floor((now - lastUpdate) / 1000)
+
+        const timeElement = document.getElementById('tempoUpdate')
+
+        if (diffSeconds <= 1) {
+          timeElement.innerText = 'Atualizado agora'
+        } else if (diffSeconds < 60) {
+          timeElement.innerText = `Há ${diffSeconds} seg atrás`
+        } else {
+          const diffMinutes = Math.floor(diffSeconds / 60)
+          const minuteText = diffMinutes === 1 ? 'minuto' : 'minutos'
+          timeElement.innerText = `Há ${diffMinutes} ${minuteText} atrás`
+        }
+      }
+
+      setInterval(updateTimeText, 1000)
+
+      setInterval(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'bottom-end',
+          showConfirmButton: false,
+          timer: 2000,
+          didOpen: (toast) => {
+            toast.style.marginBottom = '80px'
+          },
+        })
+        Toast.fire({ icon: 'info', title: 'Atualizando lista...' })
+
+        loadOrders()
+      }, 60000)
+
+      async function updateStatus(id, field, value) {
+        try {
+          const response = await fetch(`${API_URL}/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [field]: value }),
+          })
+
+          if (response.ok) {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+            })
+            Toast.fire({ icon: 'success', title: 'Salvo!' })
+          } else {
+            throw new Error('Erro ao salvar')
+          }
+        } catch (error) {
+          Swal.fire('Erro', 'Não foi possível salvar o status.', 'error')
+          loadOrders()
+        }
+      }
+
+      function confirmDeletion(id) {
+        Swal.fire({
+          title: 'Excluir Pedido?',
+          text: 'Essa ação não pode ser desfeita.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#e74c3c',
+          cancelButtonColor: '#7f8c8d',
+          confirmButtonText: 'Sim, excluir',
+          cancelButtonText: 'Cancelar',
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const response = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+              })
+
+              if (response.ok) {
+                document.getElementById(`row-${id}`).remove()
+                Swal.fire('Deletado!', 'O pedido foi removido.', 'success')
+              } else {
+                throw new Error('Falha')
+              }
+            } catch (error) {
+              Swal.fire('Erro!', 'Não foi possível excluir.', 'error')
+            }
+          }
+        })
+      }
+
+      loadOrders()
     </script>
   </body>
 </html>

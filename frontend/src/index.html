@@ -8,9 +8,26 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/assets/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/apple-touch-icon.png"
+    />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
       :root {
-        --primary-color: #0d2240; /* Azul Marinho do Logo */
+        --primary-color: #0d2240;
         --accent-color: #2c3e50;
         --bg-color: #f0f2f5;
         --white: #ffffff;
@@ -23,10 +40,12 @@
         background-color: var(--bg-color);
         margin: 0;
         padding: 20px;
+        padding-bottom: 100px;
         display: flex;
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh;
+        box-sizing: border-box;
       }
 
       .container {
@@ -44,7 +63,7 @@
       }
 
       .logo {
-        max-width: 150px; /* Tamanho ajustado do logo */
+        max-width: 150px;
         height: auto;
         margin-bottom: 10px;
       }
@@ -57,7 +76,7 @@
         letter-spacing: 1px;
       }
 
-      .form-grid {
+      form.form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 15px;
@@ -98,7 +117,6 @@
         background-color: #fff;
       }
 
-      /* ESTILO DAS FOTOS */
       .photos-container {
         display: flex;
         gap: 10px;
@@ -108,14 +126,14 @@
       .photo-thumb {
         width: 80px;
         height: 80px;
-        object-fit: cover; /* Corta a imagem para caber no quadrado */
+        object-fit: cover;
         border-radius: 6px;
         cursor: pointer;
         border: 2px solid transparent;
         transition:
           transform 0.2s,
           border-color 0.2s;
-        background-color: #ddd; /* Cor de fundo caso a imagem não carregue */
+        background-color: #ddd;
       }
 
       .photo-thumb:hover {
@@ -123,16 +141,16 @@
         border-color: var(--primary-color);
       }
 
-      /* ESTILO DO MODAL (FOTO GRANDE) */
+      /* MODAL FOTOS */
       .modal-overlay {
-        display: none; /* Escondido por padrão */
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.85);
-        z-index: 1000;
+        z-index: 2000;
         justify-content: center;
         align-items: center;
         flex-direction: column;
@@ -175,6 +193,7 @@
         background-color: #1a3a5e;
       }
 
+      /* LISTA DE PEDIDOS */
       .lista-container {
         margin-top: 30px;
         border-top: 2px dashed var(--border);
@@ -199,6 +218,7 @@
         justify-content: space-between;
         align-items: center;
         font-size: 0.9rem;
+        animation: fadeIn 0.3s ease-out;
       }
 
       .detalhes-item {
@@ -209,7 +229,6 @@
       .detalhes-item strong {
         color: var(--primary-color);
       }
-
       .detalhes-item span {
         color: #666;
         font-size: 0.85rem;
@@ -267,7 +286,66 @@
         transform: scale(0.98);
       }
 
-      /* Animação simples */
+      /* --- STICKY FOOTER BAR --- */
+      .sticky-checkout-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        padding: 15px 20px;
+        box-sizing: border-box;
+        display: none;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 900;
+        border-top: 1px solid var(--border);
+        animation: slideUp 0.4s ease-out;
+      }
+
+      .sticky-info {
+        display: flex;
+        flex-direction: column;
+      }
+      .sticky-total {
+        font-weight: bold;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+      }
+      .sticky-count {
+        font-size: 0.85rem;
+        color: #666;
+      }
+
+      .btn-sticky-finish {
+        background-color: var(--success);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.2s;
+      }
+
+      .btn-sticky-finish:active {
+        transform: scale(0.95);
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -278,37 +356,56 @@
           transform: translateY(0);
         }
       }
-      .item-pedido {
-        animation: fadeIn 0.3s ease-out;
+
+      .swal2-popup {
+        font-family: 'Roboto', sans-serif !important;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <img src="assets/logo-tsubasa.png" alt="Logo Tsubasa" class="logo" />
+        <img src="assets/logo-tsubasa.webp" alt="Logo Tsubasa" class="logo" />
         <h2>Pedido da Camiseta</h2>
       </div>
 
-      <div class="form-grid">
+      <form class="form-grid" onsubmit="return false">
         <div class="full-width form-group">
           <label>Nome do Comprador (Obrigatório)</label>
-          <input type="text" id="nomecomprador" placeholder="Ex: SUZUKI" />
+          <input
+            type="text"
+            id="nomecomprador"
+            name="name"
+            autocomplete="name"
+            placeholder="Ex: SUZUKI"
+          />
         </div>
 
         <div class="full-width form-group">
           <label>Telefone para Contato (Obrigatório)</label>
-          <input type="tel" id="telefone" placeholder="Ex: 090-0000-0000" />
+          <input
+            type="tel"
+            id="telefone"
+            name="tel"
+            autocomplete="tel"
+            placeholder="Ex: 090-0000-0000"
+          />
         </div>
 
         <div class="full-width form-group">
           <label>Nome na Camisa</label>
-          <input type="text" id="nomejogador" placeholder="Ex: SUZUKI" />
+          <input
+            type="text"
+            id="nomejogador"
+            name="camisa_nome"
+            autocomplete="off"
+            placeholder="Ex: SUZUKI"
+          />
         </div>
 
         <div class="form-group">
           <label>Tamanho (JP)</label>
-          <select id="tamanho">
+          <select id="tamanho" name="tamanho">
             <option value="JP-M">JP-M</option>
             <option value="JP-L">JP-L</option>
             <option value="JP-LL">JP-LL</option>
@@ -323,6 +420,8 @@
           <input
             type="number"
             id="numero"
+            name="numero"
+            autocomplete="off"
             placeholder="Ex: 10"
             min="0"
             max="999"
@@ -331,7 +430,7 @@
 
         <div class="full-width form-group">
           <label>Cor / Modelo</label>
-          <select id="cor">
+          <select id="cor" name="cor">
             <option value="branco">Branco (¥1100)</option>
             <option value="preto">Preto (¥1800)</option>
           </select>
@@ -341,30 +440,28 @@
           <label>Fotos do Modelo (Toque para ampliar)</label>
           <div class="photos-container">
             <img
-              src="assets/camisa branco exemplo.png"
+              src="assets/camisa-branco-exemplo.webp"
               class="photo-thumb"
-              onclick="abrirFoto(this.src)"
-              alt="Foto 1"
+              onclick="openPhoto(this.src)"
+              alt="Foto Branco"
             />
             <img
-              src="assets/camisa preta exemplo.png"
+              src="assets/camisa-preta-exemplo.webp"
               class="photo-thumb"
-              onclick="abrirFoto(this.src)"
-              alt="Foto 2"
+              onclick="openPhoto(this.src)"
+              alt="Foto Preto"
             />
             <img
-              src="assets/tabela de tamanho.png"
+              src="assets/tabela-tamanho.webp"
               class="photo-thumb"
-              onclick="abrirFoto(this.src)"
-              alt="Foto 3"
+              onclick="openPhoto(this.src)"
+              alt="Tabela Tamanho"
             />
           </div>
         </div>
-      </div>
+      </form>
 
-      <button class="btn-add" onclick="adicionarCamiseta()">
-        Adicionar Camisa +
-      </button>
+      <button class="btn-add" onclick="addTShirt()">Adicionar Camisa +</button>
 
       <div class="lista-container" id="listaContainer" style="display: none">
         <div class="titulo-lista">Resumo do Pedido</div>
@@ -381,182 +478,251 @@
           </div>
         </div>
 
-        <button class="btn-send" onclick="enviarParaBackend()">
+        <button class="btn-send" onclick="sendToBackend()">
           Confirmar e Enviar 🏐
         </button>
       </div>
     </div>
 
-    <div id="modalOverlay" class="modal-overlay" onclick="fecharFoto()">
+    <div class="sticky-checkout-bar" id="stickyBar">
+      <div class="sticky-info">
+        <span class="sticky-count" id="stickyCount">0 itens</span>
+        <span class="sticky-total"
+          >Total: ¥ <span id="stickyTotalValue">0</span></span
+        >
+      </div>
+      <button class="btn-sticky-finish" onclick="scrollToCheckout()">
+        Concluir Pedido ⬇️
+      </button>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay" onclick="closePhoto()">
       <img id="imgGrande" class="modal-img" src="" alt="Ampliada" />
       <div class="modal-close">Fechar X</div>
     </div>
 
     <script>
-      // --- CONFIGURAÇÃO ---
       const API_URL = '/api/salvar'
-      // --------------------
 
-      // --- FUNÇÕES DE FOTO ---
-      function abrirFoto(src) {
-        const modal = document.getElementById('modalOverlay')
-        const imgGrande = document.getElementById('imgGrande')
-        imgGrande.src = src
-        modal.style.display = 'flex'
+      function openPhoto(src) {
+        const modalOverlay = document.getElementById('modalOverlay')
+        const largeImg = document.getElementById('imgGrande')
+        largeImg.src = src
+        modalOverlay.style.display = 'flex'
       }
 
-      function fecharFoto() {
+      function closePhoto() {
         document.getElementById('modalOverlay').style.display = 'none'
       }
-      // -----------------------------
 
-      let pedidos = []
-      let totalGeral = 0
+      let orders = []
+      let grandTotal = 0
 
-      function adicionarCamiseta() {
-        const nomecomprador = document
-          .getElementById('nomecomprador')
-          .value.trim()
-        const telefone = document.getElementById('telefone').value.trim()
-        const nomejogador = document.getElementById('nomejogador').value.trim()
-        const tamanho = document.getElementById('tamanho').value
-        const numero = document.getElementById('numero').value
-        const cor = document.getElementById('cor').value
+      function scrollToCheckout() {
+        const sendButton = document.querySelector('.btn-send')
 
-        // Verifica se Nome, Telefone e campos da camisa estão preenchidos
-        if (!nomecomprador || !telefone || !nomejogador || !numero) {
-          alert('Por favor, preencha o todos os campos em branco.')
+        document.getElementById('listaContainer').style.display = 'block'
+
+        sendButton.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+        sendButton.style.transition = 'transform 0.2s'
+        sendButton.style.transform = 'scale(1.1)'
+        setTimeout(() => (sendButton.style.transform = 'scale(1)'), 400)
+      }
+
+      function addTShirt() {
+        const buyerName = document.getElementById('nomecomprador').value.trim()
+        const phone = document.getElementById('telefone').value.trim()
+        const playerName = document.getElementById('nomejogador').value.trim()
+        const size = document.getElementById('tamanho').value
+        const number = document.getElementById('numero').value
+        const color = document.getElementById('cor').value
+
+        if (!buyerName || !phone || !playerName || !number) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            text: 'Por favor, preencha todos os campos em branco.',
+            confirmButtonColor: '#0d2240',
+          })
           return
         }
 
-        // AQUI: Verificação do limite do número (entre 0 e 999)
-        if (parseInt(numero) > 999 || parseInt(numero) < 0) {
-          alert('O número da camisa deve ser entre 0 e 999.')
+        if (parseInt(number) > 999 || parseInt(number) < 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Número Inválido',
+            text: 'O número da camisa deve ser entre 0 e 999.',
+            confirmButtonColor: '#0d2240',
+          })
           return
         }
 
-        // Definição dos preços em Ienes
-        const preco = cor === 'preto' ? 1800 : 1100
+        const price = color === 'preto' ? 1800 : 1100
 
         const item = {
           id: Date.now(),
-          nomecomprador,
-          telefone,
-          nomejogador,
-          tamanho,
-          numero,
-          cor,
-          preco,
+          buyerName,
+          phone,
+          playerName,
+          size,
+          number,
+          color,
+          price,
         }
 
-        pedidos.push(item)
-        atualizarInterface()
+        orders.push(item)
+        updateInterface()
 
-        // Limpa campos para o próximo item
         document.getElementById('nomejogador').value = ''
         document.getElementById('numero').value = ''
         document.getElementById('nomejogador').focus()
+
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('click', Swal.close)
+          },
+        })
+        Toast.fire({
+          icon: 'success',
+          title: 'Adicionado!',
+          text: 'Se terminou, clique em Concluir Pedido abaixo 👇',
+        })
       }
 
-      function removerItem(id) {
-        pedidos = pedidos.filter((p) => p.id !== id)
-        atualizarInterface()
+      function removeItem(id) {
+        orders = orders.filter((order) => order.id !== id)
+        updateInterface()
       }
 
-      function atualizarInterface() {
-        const listaDiv = document.getElementById('lista')
-        const containerLista = document.getElementById('listaContainer')
+      function updateInterface() {
+        const listDiv = document.getElementById('lista')
+        const listContainer = document.getElementById('listaContainer')
         const totalSpan = document.getElementById('valorTotal')
 
-        const inputNomeComprador = document.getElementById('nomecomprador')
-        const inputTelefone = document.getElementById('telefone')
+        const stickyBar = document.getElementById('stickyBar')
+        const stickyTotalValue = document.getElementById('stickyTotalValue')
+        const stickyCount = document.getElementById('stickyCount')
 
-        listaDiv.innerHTML = ''
-        totalGeral = 0
+        const buyerNameInput = document.getElementById('nomecomprador')
+        const phoneInput = document.getElementById('telefone')
 
-        if (pedidos.length > 0) {
-          containerLista.style.display = 'block'
+        listDiv.innerHTML = ''
+        grandTotal = 0
 
-          // Bloqueia Nome e Telefone
-          inputNomeComprador.disabled = true
-          inputNomeComprador.style.backgroundColor = '#e9ecef'
-          inputNomeComprador.title =
+        if (orders.length > 0) {
+          listContainer.style.display = 'block'
+          stickyBar.style.display = 'flex'
+
+          buyerNameInput.disabled = true
+          buyerNameInput.style.backgroundColor = '#e9ecef'
+          buyerNameInput.title =
             'Termine este pedido ou remova os itens para trocar de nome'
 
-          inputTelefone.disabled = true
-          inputTelefone.style.backgroundColor = '#e9ecef'
+          phoneInput.disabled = true
+          phoneInput.style.backgroundColor = '#e9ecef'
         } else {
-          containerLista.style.display = 'none'
+          listContainer.style.display = 'none'
+          stickyBar.style.display = 'none'
 
-          // Desbloqueia Nome e Telefone
-          inputNomeComprador.disabled = false
-          inputNomeComprador.style.backgroundColor = '#fafafa'
-          inputNomeComprador.title = ''
+          buyerNameInput.disabled = false
+          buyerNameInput.style.backgroundColor = '#fafafa'
+          buyerNameInput.title = ''
 
-          inputTelefone.disabled = false
-          inputTelefone.style.backgroundColor = '#fafafa'
+          phoneInput.disabled = false
+          phoneInput.style.backgroundColor = '#fafafa'
         }
 
-        pedidos.forEach((p) => {
-          totalGeral += p.preco
-
-          listaDiv.innerHTML += `
+        orders.forEach((p) => {
+          grandTotal += p.price
+          listDiv.innerHTML += `
                 <div class="item-pedido">
                     <div class="detalhes-item">
-                        <strong>${p.nomejogador} (#${p.numero})</strong>
-                        <span>Tam: ${p.tamanho} | Cor: ${p.cor.toUpperCase()}</span>
+                        <strong>${p.playerName} (#${p.number})</strong>
+                        <span>Tam: ${p.size} | Cor: ${p.color.toUpperCase()}</span>
                     </div>
                     <div style="display:flex; align-items:center;">
-                        <span class="preco-item">¥${p.preco}</span>
-                        <button class="btn-remove" onclick="removerItem(${p.id})">&times;</button>
+                        <span class="preco-item">¥${p.price}</span>
+                        <button class="btn-remove" onclick="removeItem(${p.id})">&times;</button>
                     </div>
                 </div>`
         })
 
-        totalGeral += 300
+        let finalTotal = grandTotal + 300
+        if (orders.length === 0) finalTotal = 0
 
-        totalSpan.innerText = totalGeral
+        totalSpan.innerText = finalTotal
+        stickyTotalValue.innerText = finalTotal
+        stickyCount.innerText = `${orders.length} item(s) + Frete`
       }
 
-      async function enviarParaBackend() {
-        if (
-          !confirm(
-            `Confirma o pedido de ${pedidos.length} camisas no total de ¥${totalGeral}?`
-          )
-        )
-          return
+      async function sendToBackend() {
+        const totalToSend = grandTotal + 300
 
-        const btn = document.querySelector('.btn-send')
-        const textoOriginal = btn.innerText
-        btn.innerText = 'Enviando...'
-        btn.disabled = true
+        const result = await Swal.fire({
+          title: 'Confirmar Pedido?',
+          html: `Você tem <b>${orders.length} camisas</b> no carrinho.<br>Total com frete: <b>¥${totalToSend}</b>`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#27ae60',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sim, enviar pedido!',
+          cancelButtonText: 'Cancelar',
+        })
+
+        if (!result.isConfirmed) return
+
+        const submitButton = document.querySelector('.btn-send')
+        const originalText = submitButton.innerText
+        submitButton.innerText = 'Enviando...'
+        submitButton.disabled = true
 
         try {
           const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              pedidos,
-              total: totalGeral,
+              orders,
+              total: totalToSend,
               data: new Date(),
             }),
           })
 
           if (response.ok) {
-            alert(
-              'Pedido enviado com sucesso! Obrigado. Caso deseja cancelar, entre em contato com o administrador do Tsubasa!'
-            )
-            pedidos = []
-            atualizarInterface()
+            await Swal.fire({
+              icon: 'success',
+              title: 'Sucesso!',
+              text: 'Pedido enviado com sucesso! Obrigado.',
+              confirmButtonColor: '#0d2240',
+            })
+
+            orders = []
+            updateInterface()
+            window.scrollTo({ top: 0, behavior: 'smooth' })
           } else {
-            alert('Erro ao enviar. Tente novamente.')
+            Swal.fire({
+              icon: 'error',
+              title: 'Ops...',
+              text: 'Erro ao enviar. Tente novamente.',
+              confirmButtonColor: '#0d2240',
+            })
           }
         } catch (error) {
           console.error(error)
-          alert('Erro de conexão. Verifique se o servidor está ligado.')
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro de Conexão',
+            text: 'Verifique se o servidor está ligado.',
+            confirmButtonColor: '#0d2240',
+          })
         } finally {
-          btn.innerText = textoOriginal
-          btn.disabled = false
+          submitButton.innerText = originalText
+          submitButton.disabled = false
         }
       }
     </script>
