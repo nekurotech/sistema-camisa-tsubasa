@@ -361,6 +361,33 @@
         font-family: 'Roboto', sans-serif !important;
       }
 
+      /* --- ESTILOS DE AVISO (WARNING) --- */
+      .input-warning {
+        border-color: #f39c12 !important;
+        box-shadow: 0 0 0 1p #f39c12;
+      }
+
+      .validation-msg {
+        color: #d35400;
+        font-size: 0.8rem;
+        margin-top: 5px;
+        font-weight: bold;
+        display: none;
+        animation: fadeIn 0.3s;
+      }
+
+      .badge-warning {
+        background-color: #f39c12;
+        color: white;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
       .egg-box {
         display: flex;
         justify-content: center;
@@ -466,7 +493,10 @@
             placeholder="Ex: 10"
             min="0"
             max="999"
+            onblur="checkNumberUsage()"
+            oninput="clearNumberWarning()"
           />
+          <div id="msgAvisoNumero" class="validation-msg"></div>
         </div>
 
         <div class="full-width form-group">
@@ -719,6 +749,8 @@
         totalSpan.innerText = finalTotal
         stickyTotalValue.innerText = finalTotal
         stickyCount.innerText = `${orders.length} item(s) + Frete`
+
+        clearNumberWarning()
       }
 
       async function sendToBackend() {
@@ -783,6 +815,63 @@
         } finally {
           submitButton.innerText = originalText
           submitButton.disabled = false
+        }
+      }
+
+      let conflictCount = 0
+
+      function clearNumberWarning() {
+        const input = document.getElementById('numero')
+        const msgDiv = document.getElementById('msgAvisoNumero')
+
+        input.classList.remove('input-warning')
+        msgDiv.style.display = 'none'
+        msgDiv.innerText = ''
+        conflictCount = 0
+      }
+
+      async function checkNumberUsage() {
+        const numberInput = document.getElementById('numero')
+        const msgDiv = document.getElementById('msgAvisoNumero')
+        const numberValue = numberInput.value
+
+        if (!numberValue) return
+
+        try {
+          // Ajuste a URL conforme sua necessidade (/api/check-number ou similar)
+          const response = await fetch(`/api/check-number/${numberValue}`)
+
+          if (response.ok) {
+            const data = await response.json()
+
+            if (data.count > 0) {
+              // 1. Muda estilo do Input
+              numberInput.classList.add('input-warning')
+
+              // 2. Mostra mensagem em baixo
+              msgDiv.style.display = 'block'
+              msgDiv.innerHTML = `Aviso: Pode escolher mas hà ${data.count} pessoa(s) com este número.`
+
+              // 3. Guarda o dado para usar ao adicionar na lista
+              conflictCount = data.count
+
+              // Toast (Opcional, se quiser manter o aviso flutuante também)
+              const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+              })
+              Toast.fire({
+                icon: 'warning',
+                title: `Número ${numberValue} já em uso!`,
+              })
+            } else {
+              clearNumberWarning()
+            }
+          }
+        } catch (error) {
+          console.error('Erro ao verificar número:', error)
         }
       }
 

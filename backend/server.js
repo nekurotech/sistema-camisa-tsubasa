@@ -7,6 +7,20 @@ const app = express()
 const PORT = process.env.SERVER_PORT || 3000
 const FILE_PATH = './data/pedidos.json'
 
+const LEGACY_ORDERS = [
+  { name: 'GUILHERME', number: 1 },
+  { name: 'LUCAS', number: 0 },
+  { name: 'SASAKI', number: 11 },
+  { name: 'VICTOR', number: 21 },
+  { name: 'KEIYAN', number: 7 },
+  { name: 'LACAVA', number: 2 },
+  { name: 'TIAGO K', number: 18 },
+  { name: 'MONICA', number: 17 },
+  { name: 'DUDA', number: 5 },
+  { name: 'KAORY', number: 0 },
+  { name: 'ANDREY', number: 15 },
+]
+
 app.use(cors())
 app.use(express.json({ limit: '10kb' }))
 
@@ -115,6 +129,52 @@ app.delete('/pedidos/:id', (req, res) => {
         res.json({ success: true })
       }
     )
+  })
+})
+
+app.get('/check-number/:number', (req, res) => {
+  const numberToCheck = req.params.number
+
+  fs.readFile(FILE_PATH, 'utf8', (err, fileData) => {
+    const playersWithNumber = []
+
+    LEGACY_ORDERS.forEach((legacyItem) => {
+      if (String(legacyItem.number) === String(numberToCheck)) {
+        if (legacyItem.name) {
+          playersWithNumber.push(legacyItem.name.trim().toUpperCase())
+        }
+      }
+    })
+
+    if (!err && fileData) {
+      try {
+        const orders = JSON.parse(fileData)
+
+        orders.forEach((order) => {
+          const itemsList = order.orders || order.pedidos || []
+
+          itemsList.forEach((item) => {
+            const itemNumber = item.number || item.numero
+            const itemName = item.playerName || item.nomejogador
+
+            if (String(itemNumber) === String(numberToCheck)) {
+              if (itemName) {
+                playersWithNumber.push(itemName.trim().toUpperCase())
+              }
+            }
+          })
+        })
+      } catch (e) {
+        console.error('Error parsing JSON for check-number', e)
+      }
+    }
+
+    const uniquePlayers = [...new Set(playersWithNumber)]
+
+    res.json({
+      count: uniquePlayers.length,
+      names: uniquePlayers,
+    })
   })
 })
 
