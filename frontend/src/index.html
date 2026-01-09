@@ -360,6 +360,47 @@
       .swal2-popup {
         font-family: 'Roboto', sans-serif !important;
       }
+
+      .egg-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        background-color: #fcfbf8;
+        color: white;
+        border: 2px solid transparent;
+      }
+
+      .egg-content {
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 300px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .btn-egg {
+        background-color: #e67e22;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        transition: transform 0.2s;
+        display: inline-block;
+      }
+
+      .btn-egg:hover {
+        transform: scale(1.05);
+        background-color: #d35400;
+      }
     </style>
   </head>
   <body>
@@ -457,6 +498,9 @@
               onclick="openPhoto(this.src)"
               alt="Tabela Tamanho"
             />
+            <div class="photo-thumb egg-box" onclick="openEasterEgg()">
+              <span></span>
+            </div>
           </div>
         </div>
       </form>
@@ -499,6 +543,22 @@
     <div id="modalOverlay" class="modal-overlay" onclick="closePhoto()">
       <img id="imgGrande" class="modal-img" src="" alt="Ampliada" />
       <div class="modal-close">Fechar X</div>
+    </div>
+
+    <div id="modalEasterEgg" class="modal-overlay" onclick="closeEasterEgg()">
+      <div class="egg-content" onclick="event.stopPropagation()">
+        <div style="font-size: 3rem; margin-bottom: 10px">🎉</div>
+        <h3 style="color: white; margin: 0 0 10px 0">Você achou um segredo!</h3>
+        <p style="color: #ddd; text-align: center">
+          Parabéns! Você encontrou nosso item secreto.
+        </p>
+
+        <a href="/yoteiball-eh-muita-aura" target="_blank" class="btn-egg">
+          Ver Página Secreta 🚀
+        </a>
+
+        <div class="modal-close" onclick="closeEasterEgg()">Fechar X</div>
+      </div>
     </div>
 
     <script>
@@ -724,6 +784,16 @@
           submitButton.innerText = originalText
           submitButton.disabled = false
         }
+      }
+
+      function openEasterEgg() {
+        const modal = document.getElementById('modalEasterEgg')
+        modal.style.display = 'flex'
+      }
+
+      function closeEasterEgg() {
+        const modal = document.getElementById('modalEasterEgg')
+        modal.style.display = 'none'
       }
     </script>
   </body>
