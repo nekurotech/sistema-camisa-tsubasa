@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Desafio Tsubasa - Forca</title>
+    <title>Desafio Tsubasa - Modo História</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -11,7 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-      /* --- DESIGN SYSTEM ORIGINAL --- */
       :root {
         --primary-color: #0d2240;
         --accent-color: #2c3e50;
@@ -37,7 +36,7 @@
       .container {
         background-color: #fcfbf8;
         width: 100%;
-        max-width: 500px; /* Um pouco mais largo para o teclado */
+        max-width: 600px;
         padding: 30px;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -46,45 +45,71 @@
 
       h2 {
         color: var(--primary-color);
-        margin: 0 0 20px 0;
+        margin: 0 0 10px 0;
         font-size: 1.5rem;
         text-transform: uppercase;
         letter-spacing: 1px;
       }
 
-      /* --- ESTILOS DO JOGO DA FORCA --- */
+      .level-badge {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-bottom: 20px;
+        display: inline-block;
+      }
 
       /* Área do desenho SVG */
       .hangman-drawing-area {
-        height: 180px;
-        margin-bottom: 20px;
+        height: 150px;
+        margin-bottom: 10px;
         color: var(--accent-color);
       }
 
-      /* Partes do corpo (começam escondidas) */
       .hangman-part {
-        display: none; /* Ou opacity: 0 com transition se quiser animar */
+        display: none;
         stroke: var(--primary-color);
         stroke-width: 4;
         stroke-linecap: round;
         fill: none;
       }
 
-      /* Área da palavra */
+      /* Área de Construção da Frase */
+      .sentence-builder {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+        font-style: italic;
+        min-height: 25px;
+      }
+
+      .enigma-box {
+        background-color: #e8f4fd;
+        border: 1px solid #b6e1fc;
+        color: #0d2240;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-size: 0.95rem;
+      }
+
+      /* Palavra Atual */
       .word-display {
         font-size: 2rem;
         font-weight: bold;
         letter-spacing: 0.5rem;
-        margin: 25px 0;
+        margin: 20px 0;
         color: var(--primary-color);
         min-height: 40px;
+        word-wrap: break-word;
       }
 
-      /* Teclado virtual */
       .keyboard {
         display: grid;
-        grid-template-columns: repeat(7, 1fr); /* 7 letras por linha */
-        gap: 8px;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
         margin-top: 20px;
       }
 
@@ -94,52 +119,32 @@
         color: var(--primary-color);
         font-size: 1rem;
         font-weight: bold;
-        padding: 10px 5px;
+        padding: 12px 5px;
         border-radius: 6px;
         cursor: pointer;
         transition: all 0.2s;
-        font-family: 'Roboto', sans-serif;
       }
 
       .key-btn:hover:not(:disabled) {
         background-color: var(--primary-color);
         color: white;
-        border-color: var(--primary-color);
       }
 
-      /* Estados dos botões */
       .key-btn:disabled {
         cursor: not-allowed;
         opacity: 0.6;
       }
-
       .key-btn.correct {
         background-color: var(--success);
         color: white;
         border-color: var(--success);
       }
-
       .key-btn.wrong {
         background-color: var(--danger);
         color: white;
         border-color: var(--danger);
       }
 
-      /* Área de mensagens de status */
-      .game-status {
-        font-weight: bold;
-        margin: 15px 0;
-        min-height: 24px;
-        font-size: 1.1rem;
-      }
-      .status-win {
-        color: var(--success);
-      }
-      .status-loss {
-        color: var(--danger);
-      }
-
-      /* Botão de reiniciar (estilo similar ao btn-add do site principal) */
       .btn-reset {
         background-color: var(--primary-color);
         color: white;
@@ -153,9 +158,8 @@
         margin-top: 25px;
         transition: background 0.3s;
         text-transform: uppercase;
-        display: none; /* Aparece só no final */
+        display: none;
       }
-
       .btn-reset:hover {
         background-color: #1a3a5e;
       }
@@ -167,11 +171,7 @@
         text-decoration: none;
         font-size: 0.9rem;
       }
-      .back-link:hover {
-        text-decoration: underline;
-      }
 
-      /* SweetAlert Font Fix */
       .swal2-popup {
         font-family: 'Roboto', sans-serif !important;
       }
@@ -179,13 +179,8 @@
   </head>
   <body>
     <div class="container">
-      <div style="margin-bottom: 20px">
-        <span style="font-size: 3rem">🏐</span>
-      </div>
       <h2>Desafio Secreto</h2>
-      <p style="color: #666; margin-bottom: 25px">
-        Descubra a palavra secreta do time!
-      </p>
+      <div id="levelDisplay" class="level-badge">Fase 1/3</div>
 
       <svg class="hangman-drawing-area" viewBox="0 0 200 180">
         <g stroke="var(--accent-color)" stroke-width="4" stroke-linecap="round">
@@ -194,7 +189,6 @@
           <line x1="50" y1="20" x2="130" y2="20" />
           <line x1="130" y1="20" x2="130" y2="40" />
         </g>
-
         <circle id="part-1" class="hangman-part" cx="130" cy="60" r="20" />
         <line
           id="part-2"
@@ -238,59 +232,99 @@
         />
       </svg>
 
-      <div id="wordDisplay" class="word-display"></div>
+      <div id="sentenceBuilder" class="sentence-builder">...</div>
 
-      <div id="gameStatus" class="game-status"></div>
+      <div id="enigmaDisplay" class="enigma-box">💡 Dica: Carregando...</div>
+
+      <div id="wordDisplay" class="word-display"></div>
 
       <div id="keyboard" class="keyboard"></div>
 
-      <button id="btnReset" class="btn-reset" onclick="initGame()">
-        Jogar Novamente 🔄
+      <button id="btnReset" class="btn-reset" onclick="restartFullGame()">
+        Reiniciar Desafio 🔄
       </button>
-
-      <a href="/index.html" class="back-link">← Voltar para o pedido</a>
+      <a href="index.html" class="back-link">← Voltar</a>
     </div>
 
     <script>
-      // --- CONFIGURAÇÃO ---
-      const SECRET_WORD = 'TSUBASA'
-      const MAX_MISTAKES = 6 // Cabeça, corpo, 2 braços, 2 pernas
+      // --- CONFIGURAÇÃO DOS NÍVEIS (Modo História) ---
+      // Connector: Texto que aparece ANTES da palavra quando chega na fase
+      const LEVELS = [
+        {
+          word: 'ASAS',
+          hint: 'Sou o símbolo da liberdade. Anjos têm, aviões têm e os jogadores do Tsubasa carregam no nome. O que somos?',
+          connector: 'Nossas ', // Começa a frase com letra maiúscula no conector
+        },
+        {
+          word: 'VOAM',
+          hint: 'Não é caminhar, não é nadar. É o que se faz no céu. O que a bola faz depois de um saque viagem perfeito?',
+          connector: ' ',
+        },
+        {
+          word: 'YOTEIBALL',
+          hint: 'Sou digital, verde ou azul, e vivo pedindo para você confirmar presença. Sem mim, o time não se reúne. Quem sou eu?',
+          connector: ' pelo ', // Conector explicativo
+        },
+      ]
 
-      // --- ESTADO DO JOGO ---
+      const MAX_MISTAKES = 6
+
+      // --- ESTADO GLOBAL ---
+      let currentLevelIndex = 0
       let guessedLetters = new Set()
-      let mistakes = 0
-      let isGameOver = false
+      let globalMistakes = 0 // Vida persistente entre as fases
+      let completedSentence = '' // Guarda a frase montada
 
-      // --- ELEMENTOS DOM ---
+      // --- ELEMENTOS ---
       const wordDisplay = document.getElementById('wordDisplay')
       const keyboardDiv = document.getElementById('keyboard')
-      const gameStatus = document.getElementById('gameStatus')
+      const enigmaDisplay = document.getElementById('enigmaDisplay')
+      const sentenceBuilder = document.getElementById('sentenceBuilder')
+      const levelDisplay = document.getElementById('levelDisplay')
       const btnReset = document.getElementById('btnReset')
       const hangmanParts = document.querySelectorAll('.hangman-part')
 
       // --- INICIALIZAÇÃO ---
-      function initGame() {
-        // Resetar estado
+      function initLevel() {
+        // Pega dados do nível atual
+        const currentLevelData = LEVELS[currentLevelIndex]
+
+        // Atualiza UI
+        levelDisplay.innerText = `Fase ${currentLevelIndex + 1}/${LEVELS.length}`
+        enigmaDisplay.innerHTML = `💡 <strong>Enigma:</strong> ${currentLevelData.hint}`
+
+        // Mostra o que já foi completado da frase
+        // Se for nivel 1, mostra reticencias, senao mostra a frase + conector atual
+        if (currentLevelIndex === 0) {
+          sentenceBuilder.innerText = 'Descubra a primeira palavra...'
+        } else {
+          sentenceBuilder.innerText =
+            completedSentence + currentLevelData.connector + '...'
+        }
+
+        // Reseta letras chutadas (mas NÃO os erros globais)
         guessedLetters.clear()
-        mistakes = 0
-        isGameOver = false
 
-        // Resetar UI
-        gameStatus.innerHTML = ''
-        gameStatus.className = 'game-status'
-        btnReset.style.display = 'none'
-
-        // Esconder partes do boneco
-        hangmanParts.forEach((part) => (part.style.display = 'none'))
-
-        // Gerar teclado e palavra inicial
+        // Gera teclado e display
         generateKeyboard()
         updateWordDisplay()
       }
 
-      // --- LÓGICA DO JOGO ---
+      function restartFullGame() {
+        currentLevelIndex = 0
+        globalMistakes = 0
+        completedSentence = ''
 
-      // Gera os botões A-Z
+        // Esconde botão reset
+        btnReset.style.display = 'none'
+
+        // Limpa boneco
+        hangmanParts.forEach((part) => (part.style.display = 'none'))
+
+        // Habilita teclado
+        initLevel()
+      }
+
       function generateKeyboard() {
         keyboardDiv.innerHTML = ''
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
@@ -305,93 +339,109 @@
         })
       }
 
-      // Processa o clique em uma letra
       function handleGuess(letter) {
-        if (isGameOver || guessedLetters.has(letter)) return
-
         guessedLetters.add(letter)
         const button = document.getElementById(`key-${letter}`)
         button.disabled = true
 
-        if (SECRET_WORD.includes(letter)) {
-          // Acertou
+        const currentWord = LEVELS[currentLevelIndex].word
+
+        if (currentWord.includes(letter)) {
           button.classList.add('correct')
           updateWordDisplay()
-          checkWin()
+          checkWinCondition()
         } else {
-          // Errou
           button.classList.add('wrong')
-          mistakes++
-          showNextHangmanPart()
-          checkLoss()
+          globalMistakes++
+          updateHangman()
+          checkLossCondition()
         }
       }
 
-      // Atualiza os underscores _ _ _ S _ _ A
       function updateWordDisplay() {
-        const displayArray = SECRET_WORD.split('').map((char) => {
+        const currentWord = LEVELS[currentLevelIndex].word
+        const displayArray = currentWord.split('').map((char) => {
           return guessedLetters.has(char) ? char : '_'
         })
         wordDisplay.innerText = displayArray.join(' ')
       }
 
-      // Mostra a próxima parte do desenho SVG
-      function showNextHangmanPart() {
-        // mistakes é 1-based, array é 0-based, mas os IDs são part-1, part-2...
-        const partToShow = document.getElementById(`part-${mistakes}`)
-        if (partToShow) {
-          partToShow.style.display = 'block'
+      function updateHangman() {
+        // Mostra partes baseado no erro global
+        const partToShow = document.getElementById(`part-${globalMistakes}`)
+        if (partToShow) partToShow.style.display = 'block'
+      }
+
+      function checkWinCondition() {
+        const currentWord = LEVELS[currentLevelIndex].word
+        const displayed = wordDisplay.innerText.replace(/ /g, '')
+
+        if (displayed === currentWord) {
+          // ACERTOU A PALAVRA DO NÍVEL!
+
+          // Adiciona a palavra à frase completa
+          const levelData = LEVELS[currentLevelIndex]
+          completedSentence += levelData.connector + levelData.word
+
+          // Animaçãozinha
+          Swal.fire({
+            icon: 'success',
+            title: 'Correto!',
+            text: `Você descobriu: ${levelData.word}`,
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            // Avança de fase
+            currentLevelIndex++
+
+            if (currentLevelIndex < LEVELS.length) {
+              // Tem mais fases
+              initLevel()
+            } else {
+              // ZEROU O JOGO
+              finishGame(true)
+            }
+          })
         }
       }
 
-      // Verifica vitória
-      function checkWin() {
-        const currentWord = wordDisplay.innerText.replace(/ /g, '')
-        if (currentWord === SECRET_WORD) {
-          endGame(true)
+      function checkLossCondition() {
+        if (globalMistakes >= MAX_MISTAKES) {
+          finishGame(false)
         }
       }
 
-      // Verifica derrota
-      function checkLoss() {
-        if (mistakes >= MAX_MISTAKES) {
-          endGame(false)
-        }
-      }
-
-      // Finaliza o jogo
-      function endGame(won) {
-        isGameOver = true
-
-        // Desabilitar teclado
+      function finishGame(won) {
+        // Desabilita tudo
         const keys = document.querySelectorAll('.key-btn')
         keys.forEach((key) => (key.disabled = true))
-
-        // Mostrar botão de reiniciar
         btnReset.style.display = 'block'
 
         if (won) {
-          gameStatus.innerText = '🎉 Parabéns! Você acertou!'
-          gameStatus.classList.add('status-win')
+          sentenceBuilder.innerText = 'Frase Completa:'
+          wordDisplay.innerText = completedSentence
+          wordDisplay.style.fontSize = '1.5rem'
+
           Swal.fire({
             icon: 'success',
-            title: 'Vitória!',
-            text: 'Você descobriu a palavra secreta +10000 aura!',
-            confirmButtonColor: '#27ae60',
+            title: 'Parabéns!',
+            text: 'Você completou o enigma do Tsubasa!',
+            confirmButtonText: 'Somos Tsubasa! 🏐',
+            confirmButtonColor: '#0d2240',
           })
+          enigmaDisplay.innerHTML = `🎉 <strong>${completedSentence}</strong> 🎉`
         } else {
-          gameStatus.innerText = `💀 Game Over! -10000 aura`
-          gameStatus.classList.add('status-loss')
           Swal.fire({
             icon: 'error',
-            title: 'Que pena!',
-            text: 'Você foi enforcado. Tente novamente!',
+            title: 'Game Over',
+            text: 'O boneco foi completado antes da frase final.',
             confirmButtonColor: '#e74c3c',
           })
         }
       }
 
-      initGame()
+      // Inicia
+      restartFullGame()
     </script>
   </body>
 </html>
